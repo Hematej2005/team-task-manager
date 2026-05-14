@@ -249,7 +249,7 @@ Handles:
 ## 1️⃣ Clone Repository
 
 ```bash
-git clone https://github.com/your-username/team-task-manager.git
+git clone https://github.com/Hematej2005/team-task-manager.git
 ```
 
 ---
