@@ -10,47 +10,47 @@ A Full-Stack Role-Based Task Management Web Application built using **Java Sprin
 
 👉 https://team-task-manager-production-1c8c.up.railway.app
 
-> ## ⚠️ Note
->
-> If the deployed Railway domain shows errors like:
->
-> ```text
-> DNS_PROBE_FINISHED_NXDOMAIN
-> ```
->
-> or
->
-> ```text
-> This site can’t be reached
-> ```
->
-> it may be caused by local DNS cache or network DNS resolution issues.
->
-> ### ✅ Solution
->
-> Change your DNS server to:
->
-> #### Google DNS
->
-> ```text
-> Preferred DNS : 8.8.8.8
-> Alternate DNS : 8.8.4.4
-> ```
->
-> #### OR Cloudflare DNS
->
-> ```text
-> Preferred DNS : 1.1.1.1
-> Alternate DNS : 1.0.0.1
-> ```
->
-> After changing the DNS:
->
-> - Restart the browser
-> - Refresh the network connection
-> - Reopen the deployed URL
->
-> The application should work properly after DNS propagation.
+## ⚠️ Note
+
+ If the deployed Railway domain shows errors like:
+
+ ```text
+ DNS_PROBE_FINISHED_NXDOMAIN
+ ```
+
+ or
+
+ ```text
+ This site can’t be reached
+ ```
+
+ it may be caused by local DNS cache or network DNS resolution issues.
+
+ ### ✅ Solution
+
+ Change your DNS server to:
+
+ #### Google DNS
+
+ ```text
+ Preferred DNS : 8.8.8.8
+ Alternate DNS : 8.8.4.4
+ ```
+
+ #### OR Cloudflare DNS
+
+ ```text
+ Preferred DNS : 1.1.1.1
+ Alternate DNS : 1.0.0.1
+ ```
+
+ After changing the DNS:
+
+ - Restart the browser
+ - Refresh the network connection
+ - Reopen the deployed URL
+
+ The application should work properly after DNS propagation.
 
 ---
 
