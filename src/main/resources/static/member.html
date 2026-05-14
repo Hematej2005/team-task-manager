@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Dashboard</title>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial,sans-serif;
+        }
+
+        body{
+            background:#f2f2f2;
+        }
+
+        header{
+            width:100%;
+            padding:15px 30px;
+            background:#007bff;
+            color:white;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        header h2{
+            color:white;
+        }
+
+        header button{
+            padding:10px 18px;
+            border:none;
+            background:red;
+            color:white;
+            border-radius:5px;
+            cursor:pointer;
+        }
+
+        .container{
+            width:95%;
+            margin:30px auto;
+        }
+
+        .task-title{
+            margin-bottom:20px;
+        }
+
+        .task-card{
+            background:white;
+            padding:18px;
+            border-radius:10px;
+            margin-bottom:15px;
+            box-shadow:0 0 10px rgba(0,0,0,0.1);
+            cursor:pointer;
+        }
+
+        .task-header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        .task-header h3{
+            font-size:18px;
+        }
+
+        .arrow{
+            font-size:22px;
+            font-weight:bold;
+            transition:0.3s;
+        }
+
+        .rotate{
+            transform:rotate(180deg);
+        }
+
+        .task-details{
+            display:none;
+            margin-top:15px;
+            border-top:1px solid #ddd;
+            padding-top:15px;
+        }
+
+        .task-details p{
+            margin-top:10px;
+        }
+
+        select{
+            width:100%;
+            padding:12px;
+            margin-top:15px;
+            border:1px solid #ccc;
+            border-radius:5px;
+            font-size:15px;
+        }
+
+        .status-btn{
+            padding:12px 18px;
+            margin-top:15px;
+            border:none;
+            border-radius:5px;
+            background:green;
+            color:white;
+            cursor:pointer;
+            font-size:15px;
+        }
+
+        #message{
+            margin-bottom:20px;
+            font-size:16px;
+            font-weight:bold;
+        }
+
+        .success{
+            color:green;
+        }
+
+        .error{
+            color:red;
+        }
+
+        .completed-text{
+            margin-top:15px;
+            color:green;
+            font-weight:bold;
+        }
+
+        .overdue{
+            color:red;
+            font-weight:bold;
+            margin-top:12px;
+        }
+
+        @media(max-width:768px){
+
+            .container{
+                width:95%;
+            }
+
+        }
+
+    </style>
+
+</head>
+<body>
+
+<header>
+
+    <h2>Member Dashboard</h2>
+
+    <button id="logoutBtn">
+        Logout
+    </button>
+
+</header>
+
+<div class="container">
+
+    <p id="message"></p>
+
+    <h2 class="task-title">
+        Assigned Tasks
+    </h2>
+
+    <div id="taskContainer"></div>
+
+</div>
+
+<script>
+
+    const logoutBtn=document.getElementById("logoutBtn");
+
+    const taskContainer=document.getElementById("taskContainer");
+
+    const message=document.getElementById("message");
+
+    logoutBtn.addEventListener("click",async function(){
+
+        message.innerText="";
+        message.className="";
+
+        try{
+
+            const response=await fetch(
+            "/api/auth/logout",
+            {
+                method:"POST",
+                credentials:"include"
+            });
+
+            if(response.ok){
+
+                message.innerText="Logout successful";
+
+                message.classList.add("success");
+
+                setTimeout(function(){
+
+                    window.location.href="login.html";
+
+                },1000);
+
+            }else{
+
+                message.innerText="Logout failed";
+
+                message.classList.add("error");
+
+            }
+
+        }catch(error){
+
+            message.innerText="Something went wrong";
+
+            message.classList.add("error");
+
+        }
+
+    });
+
+    async function loadTasks(){
+
+        try{
+
+            const response=await fetch(
+            "/api/member/tasks",
+            {
+                credentials:"include"
+            });
+
+            const tasks=await response.json();
+
+            taskContainer.innerHTML="";
+
+            if(tasks.length===0){
+
+                taskContainer.innerHTML=
+                "<p>No Tasks Assigned</p>";
+
+                return;
+            }
+
+            tasks.forEach(function(task,index){
+
+                const card=document.createElement("div");
+
+                card.classList.add("task-card");
+
+                let statusSection="";
+
+                if(task.status==="PENDING"){
+
+                    statusSection=`
+
+                        <button
+                            class="status-btn"
+                            onclick="acceptTask(event,${task.id})"
+                        >
+                            Accept
+                        </button>
+
+                    `;
+
+                }
+                else if(task.status==="COMPLETED"){
+
+                    statusSection=`
+
+                        <p class="completed-text">
+                            Task Completed
+                        </p>
+
+                    `;
+
+                }
+                else{
+
+                    statusSection=`
+
+                        <select
+                            onclick="event.stopPropagation()"
+                            onchange="updateStatus(event,${task.id},this.value)"
+                        >
+
+                            <option value="">
+                                Update Status
+                            </option>
+
+                            <option value="IN_PROGRESS">
+                                IN_PROGRESS
+                            </option>
+
+                            <option value="COMPLETED">
+                                COMPLETED
+                            </option>
+
+                        </select>
+
+                    `;
+
+                }
+
+                const today=new Date();
+
+                const deadlineDate=new Date(task.deadline);
+
+                today.setHours(0,0,0,0);
+
+                deadlineDate.setHours(0,0,0,0);
+
+                let overdueText="";
+
+                if(deadlineDate < today && task.status!=="COMPLETED"){
+
+                    overdueText=`
+
+                        <p class="overdue">
+                            Overdue Task
+                        </p>
+
+                    `;
+
+                }
+
+                card.innerHTML=`
+
+                    <div class="task-header">
+
+                        <h3>
+                            Task ${index+1} : ${task.title}
+                        </h3>
+
+                        <span class="arrow">
+                            ▼
+                        </span>
+
+                    </div>
+
+                    <div class="task-details">
+
+                        <p><b>Description:</b> ${task.description}</p>
+
+                        <p><b>Admin:</b> ${task.adminName}</p>
+
+                        <p><b>Project:</b> ${task.projectName}</p>
+
+                        <p><b>Deadline:</b> ${task.deadline}</p>
+
+                        <p><b>Status:</b> ${task.status}</p>
+
+                        ${overdueText}
+
+                        ${statusSection}
+
+                    </div>
+
+                `;
+
+                card.addEventListener("click",function(event){
+
+                    if(
+                        event.target.tagName==="BUTTON" ||
+                        event.target.tagName==="SELECT" ||
+                        event.target.tagName==="OPTION"
+                    ){
+                        return;
+                    }
+
+                    const details=
+                    card.querySelector(".task-details");
+
+                    const arrow=
+                    card.querySelector(".arrow");
+
+                    if(details.style.display==="block"){
+
+                        details.style.display="none";
+
+                        arrow.classList.remove("rotate");
+
+                    }else{
+
+                        details.style.display="block";
+
+                        arrow.classList.add("rotate");
+
+                    }
+
+                });
+
+                taskContainer.appendChild(card);
+
+            });
+
+        }catch(error){
+
+            message.innerText="Failed to load tasks";
+
+            message.classList.add("error");
+
+        }
+
+    }
+
+    async function acceptTask(event,taskId){
+
+        event.stopPropagation();
+
+        message.innerText="";
+        message.className="";
+
+        try{
+
+            const response=await fetch(
+            `/api/member/tasks/${taskId}/accept`,
+            {
+                method:"PUT",
+                credentials:"include"
+            });
+
+            if(response.ok){
+
+                message.innerText=
+                "Task accepted successfully";
+
+                message.classList.add("success");
+
+                loadTasks();
+
+            }else{
+
+                message.innerText=
+                "Failed to accept task";
+
+                message.classList.add("error");
+
+            }
+
+        }catch(error){
+
+            message.innerText="Something went wrong";
+
+            message.classList.add("error");
+
+        }
+
+    }
+
+    async function updateStatus(event,taskId,status){
+
+        event.stopPropagation();
+
+        if(status===""){
+            return;
+        }
+
+        message.innerText="";
+        message.className="";
+
+        try{
+
+            const response=await fetch(
+            `/api/member/tasks/${taskId}/status`,
+            {
+
+                method:"PUT",
+
+                headers:{
+                    "Content-Type":"application/json"
+                },
+
+                credentials:"include",
+
+                body:JSON.stringify({
+                    status:status
+                })
+
+            });
+
+            if(response.ok){
+
+                message.innerText=
+                "Task status updated successfully";
+
+                message.classList.add("success");
+
+                loadTasks();
+
+            }else{
+
+                message.innerText=
+                "Failed to update status";
+
+                message.classList.add("error");
+
+            }
+
+        }catch(error){
+
+            message.innerText="Something went wrong";
+
+            message.classList.add("error");
+
+        }
+
+    }
+
+    loadTasks();
+
+</script>
+
+</body>
+</html>

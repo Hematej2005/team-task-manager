@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Project</title>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial,sans-serif;
+        }
+
+        body{
+            background:#f2f2f2;
+        }
+
+        header{
+            width:100%;
+            padding:15px 30px;
+            background:#007bff;
+            color:white;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        header h2{
+            font-size:24px;
+        }
+
+        header button{
+            padding:10px 18px;
+            border:none;
+            background:red;
+            color:white;
+            border-radius:5px;
+            cursor:pointer;
+        }
+
+        .container{
+            width:95%;
+            margin:30px auto;
+            background:white;
+            padding:30px;
+            border-radius:10px;
+            box-shadow:0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .form-group{
+            margin-top:20px;
+        }
+
+        label{
+            display:block;
+            margin-bottom:8px;
+            font-weight:bold;
+        }
+
+        input,textarea{
+            width:100%;
+            padding:12px;
+            border:1px solid #ccc;
+            border-radius:5px;
+            font-size:15px;
+        }
+
+        textarea{
+            resize:none;
+            height:250px;
+        }
+
+        .create-btn{
+            width:100%;
+            padding:14px;
+            margin-top:25px;
+            border:none;
+            background:#007bff;
+            color:white;
+            border-radius:5px;
+            cursor:pointer;
+            font-size:16px;
+        }
+
+        .create-btn:hover{
+            background:#0056b3;
+        }
+
+        #message{
+            margin-top:20px;
+            font-size:16px;
+            font-weight:bold;
+        }
+
+        .success{
+            color:green;
+        }
+
+        .error{
+            color:red;
+        }
+
+        @media(max-width:768px){
+
+            .container{
+                width:95%;
+                padding:20px;
+            }
+
+            textarea{
+                height:200px;
+            }
+
+        }
+
+    </style>
+
+</head>
+<body>
+
+<header>
+
+    <h2>Create Project</h2>
+
+    <button id="logoutBtn">
+        Logout
+    </button>
+
+</header>
+
+<div class="container">
+
+    <form id="projectForm">
+
+        <div class="form-group">
+
+            <label>
+                Project Name
+            </label>
+
+            <input
+                    type="text"
+                    id="projectName"
+                    placeholder="Enter Project Name"
+                    required
+            >
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Project Description
+            </label>
+
+            <textarea
+                    id="description"
+                    placeholder="Enter Complete Project Description"
+                    required
+            ></textarea>
+
+        </div>
+
+        <button type="submit" class="create-btn">
+            Create Project
+        </button>
+
+        <p id="message"></p>
+
+    </form>
+
+</div>
+
+<script>
+
+    const projectForm=document.getElementById("projectForm");
+
+    const logoutBtn=document.getElementById("logoutBtn");
+
+    const message=document.getElementById("message");
+
+    logoutBtn.addEventListener("click",async function(){
+
+        message.innerText="";
+        message.className="";
+
+        try{
+
+            const response=await fetch("/api/auth/logout",{
+
+                method:"POST",
+
+                credentials:"include"
+
+            });
+
+            if(response.ok){
+
+                message.innerText="Logout successful";
+
+                message.classList.add("success");
+
+                setTimeout(function(){
+
+                    window.location.href="login.html";
+
+                },1000);
+
+            }else{
+
+                message.innerText="Logout failed";
+
+                message.classList.add("error");
+
+            }
+
+        }catch(error){
+
+            message.innerText="Something went wrong";
+
+            message.classList.add("error");
+
+        }
+
+    });
+
+    projectForm.addEventListener("submit",async function(event){
+
+        event.preventDefault();
+
+        message.innerText="";
+        message.className="";
+
+        const projectName=
+        document.getElementById("projectName").value.trim();
+
+        const description=
+        document.getElementById("description").value.trim();
+
+        if(projectName==="" || description===""){
+
+            message.innerText="Please fill all fields";
+
+            message.classList.add("error");
+
+            return;
+        }
+
+        const projectData={
+
+            projectName:projectName,
+            description:description
+
+        };
+
+        try{
+
+            const response=await fetch("/api/admin/projects",{
+
+                method:"POST",
+
+                headers:{
+                    "Content-Type":"application/json"
+                },
+
+                credentials:"include",
+
+                body:JSON.stringify(projectData)
+
+            });
+
+            const data=await response.json();
+
+            if(response.ok){
+
+                message.innerText="Project created successfully";
+
+                message.classList.add("success");
+
+                document.getElementById("projectName").value="";
+
+                document.getElementById("description").value="";
+
+                setTimeout(function(){
+
+                    window.location.href="admin.html";
+
+                },1000);
+
+            }else{
+
+                message.innerText=data.message;
+
+                message.classList.add("error");
+
+            }
+
+        }catch(error){
+
+            message.innerText="Something went wrong";
+
+            message.classList.add("error");
+
+        }
+
+    });
+
+</script>
+
+</body>
+</html>

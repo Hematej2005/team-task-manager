@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial,sans-serif;
+        }
+
+        body{
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            background:#f2f2f2;
+        }
+
+        .container{
+            width:350px;
+            background:white;
+            padding:25px;
+            border-radius:10px;
+            box-shadow:0 0 10px rgba(0,0,0,0.2);
+        }
+
+        h2{
+            text-align:center;
+            margin-bottom:20px;
+        }
+
+        input{
+            width:100%;
+            padding:10px;
+            margin-top:10px;
+            border:1px solid #ccc;
+            border-radius:5px;
+        }
+
+        button{
+            width:100%;
+            padding:10px;
+            margin-top:15px;
+            border:none;
+            background:#28a745;
+            color:white;
+            border-radius:5px;
+            cursor:pointer;
+        }
+
+        button:hover{
+            background:#1e7e34;
+        }
+
+        p{
+            margin-top:15px;
+            text-align:center;
+        }
+
+        a{
+            text-decoration:none;
+            color:blue;
+        }
+
+        #message{
+            margin-top:15px;
+            text-align:center;
+            font-size:15px;
+            font-weight:bold;
+        }
+
+        .success{
+            color:green;
+        }
+
+        .error{
+            color:red;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <h2>Login</h2>
+
+    <form id="loginForm">
+
+        <input
+                type="email"
+                id="email"
+                placeholder="Enter Email"
+                required
+        >
+
+        <input
+                type="password"
+                id="password"
+                placeholder="Enter Password"
+                required
+        >
+
+        <button type="submit">
+            Login
+        </button>
+
+    </form>
+
+    <p id="message"></p>
+
+    <p>
+        Don't have account?
+        <a href="signup.html">Signup</a>
+    </p>
+
+</div>
+
+<script>
+
+    const loginForm=document.getElementById("loginForm");
+
+    const message=document.getElementById("message");
+
+    loginForm.addEventListener("submit",async function(event){
+
+        event.preventDefault();
+
+        message.innerText="";
+        message.className="";
+
+        const email=document.getElementById("email").value.trim();
+
+        const password=document.getElementById("password").value.trim();
+
+        if(email==="" || password===""){
+
+            message.innerText="Please fill all fields";
+
+            message.classList.add("error");
+
+            return;
+        }
+
+        const loginData={
+
+            email:email,
+            password:password
+
+        };
+
+        try{
+
+            const response=await fetch("/api/auth/login",{
+
+                method:"POST",
+
+                headers:{
+                    "Content-Type":"application/json"
+                },
+
+                credentials:"include",
+
+                body:JSON.stringify(loginData)
+
+            });
+
+            const data=await response.json();
+
+            if(response.ok){
+
+                message.innerText="Login successful";
+
+                message.classList.add("success");
+
+                setTimeout(function(){
+
+                    if(data.role==="ADMIN"){
+
+                        window.location.href="admin.html";
+
+                    }else{
+
+                        window.location.href="member.html";
+
+                    }
+
+                },1000);
+
+            }else{
+
+                message.innerText=data.message;
+
+                message.classList.add("error");
+
+            }
+
+        }catch(error){
+
+            message.innerText="Something went wrong";
+
+            message.classList.add("error");
+
+        }
+
+    });
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Task Manager</title>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial,sans-serif;
+        }
+
+        body{
+            height:100vh;
+            background:black;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            flex-direction:column;
+            color:white;
+        }
+
+        h1{
+            font-size:55px;
+            margin-bottom:40px;
+            text-align:center;
+            color:#00ffcc;
+        }
+
+        .button-box{
+            background:#1f1f1f;
+            padding:40px;
+            border-radius:15px;
+            box-shadow:0 0 15px rgba(255,255,255,0.2);
+        }
+
+        .button-box button{
+            width:220px;
+            padding:15px;
+            border:none;
+            border-radius:8px;
+            background:#007bff;
+            color:white;
+            font-size:18px;
+            cursor:pointer;
+            transition:0.3s;
+        }
+
+        .button-box button:hover{
+            background:#0056b3;
+        }
+
+        .developer{
+            position:absolute;
+            bottom:25px;
+            font-size:18px;
+            color:#cccccc;
+            text-align:center;
+        }
+
+        .developer span{
+            color:#00ffcc;
+            font-weight:bold;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<h1>
+    TEAM TASK MANAGER
+</h1>
+
+<div class="button-box">
+
+    <button onclick="openLogin()">
+        Login / Signup
+    </button>
+
+</div>
+
+<div class="developer">
+
+    Developed By <span>AKKANA VENKATA HEMATEJ</span>
+
+</div>
+
+<script>
+
+    function openLogin(){
+
+        window.location.href="login.html";
+
+    }
+
+</script>
+
+</body>
+</html>
